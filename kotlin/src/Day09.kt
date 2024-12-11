@@ -1,5 +1,3 @@
-import kotlin.time.Duration.Companion.seconds
-
 fun main() {
 
     fun String.part1(): Long =
