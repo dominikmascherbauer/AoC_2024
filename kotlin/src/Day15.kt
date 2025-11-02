@@ -1,6 +1,4 @@
 fun main() {
-
-
     data class Point(val x: Int, val y: Int)
 
     fun List<String>.findRobot(): Point =
@@ -34,6 +32,65 @@ fun main() {
             '^' -> Point(grid.size - robot.y - 1, robot.x) to grid.rotateRight()
             else -> robot to grid
         }
+
+    fun Char.getCheckLines(robot: Point, grid: List<String>): List<Pair<Int, String>> =
+        when (this) {
+            '^' ->
+                generateSequence(listOf(robot.x to grid.map { it[robot.x] }.take(robot.y))) { lines ->
+                    lines.flatMap { (x, line) ->
+                        line.mapIndexed { y, c ->
+                            if (y < line.indexOfLast { it == '.' }) {
+                                null
+                            } else if (c == '[') {
+                                x + 1 to grid.map { it[x + 1] }.take(y)
+                            } else if (c == ']') {
+                                x - 1 to grid.map { it[x - 1] }.take(y)
+                            } else {
+                                null
+                            }
+                        }.filterNotNull()
+                    }
+                }.takeWhile { it.isNotEmpty() }.toList().flatten().map { it.first to it.second.joinToString("") }
+            'v' ->
+                generateSequence(listOf(robot.x to grid.map { it[robot.x] }.drop(robot.y + 1))) { lines ->
+                    lines.flatMap { (x, line) ->
+                        line.mapIndexed { y, c ->
+                            if (line.contains('.') && y > line.indexOfFirst { it == '.' }) {
+                                null
+                            } else if (c == '[') {
+                                x + 1 to grid.map { it[x + 1] }.drop(grid.size - line.size + y + 1)
+                            } else if (c == ']') {
+                                x - 1 to grid.map { it[x - 1] }.drop(grid.size - line.size + y + 1)
+                            } else {
+                                null
+                            }
+                        }.filterNotNull()
+                    }
+                }.takeWhile { it.isNotEmpty() }.toList().flatten().map { it.first to it.second.reversed().joinToString("") }
+            '>' -> listOf(robot.y to grid[robot.y].drop(robot.x + 1).reversed())
+            else -> listOf(robot.y to grid[robot.y].take(robot.x))
+        }
+
+    /*
+    fun Char.getUpdateGrid(robot: Point, grid: List<String>, checkLines: List<Pair<Int, String>>): List<String> =
+        when (this) {
+            '^' ->
+                checkLines.fold(grid) { updatedGrid, checkLine ->
+
+                }
+                grid.mapIndexed { idx, line ->
+                    if (checkLines.any { it.first == idx }) {
+                        val checkLineIndices = checkLines.filter { it.first == idx }.map { it.second.length }.toSet()
+                        checkLineIndices.sorted().fold(line) { newLine, checkLineIndex ->
+                            newLine.take(checkLineIndex).substringBeforeLast('.') + newLine.take(checkLineIndex + 1).substringAfterLast('.') + '.' + newLine.substring(checkLineIndex + 1)
+                        }
+                    } else {
+                        line
+                    }
+                }
+        }
+
+     */
 
 
     fun String.part1(grid: List<String>): Any =
@@ -79,6 +136,8 @@ fun main() {
             } else {
                 listOf(newRobot.y to (newGrid[newRobot.y].take(newRobot.x)))
             }
+
+            move.getCheckLines(robot, updatedGrid)
 
             if (checkLines.all { checkLine -> checkLine.second.substringAfterLast('#').any { it == '.' } }) {
                 newGrid = newGrid.mapIndexed { idx, line ->
