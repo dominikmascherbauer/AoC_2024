@@ -1,0 +1,120 @@
+Some notes to solving this years problems
+Timings for performance checks were done with the profiler (so not ideal but gives an idea of how long each task runs)
+
+01: easy
+    - split a line into two numbers
+    - create a pair of lists out of a list of pairs
+    - part1: compare the sorted lists
+    - part2: group second list and to use for iterating and multiplying first list items
+performance:
+    input parsing: 20ms (contains some logic already -> the splitting and pair of list creation)
+    part1: 10ms
+    part2: <10ms
+    combined: 30ms
+
+
+02: medium
+    - parse input string to list of int
+    - part1: zip with next int to check if its always rising/falling and check if within 3
+    - part2 (first approach): check if a sequence is generally falling/rising -> if yes and within 3 count
+        otherwise find the incorrect index and check if it works after either of the contributing values is removed
+        do checks for both ways (rising/falling) for all sequences as did not want to bother checking this
+    - part2 (second approach ~Alvin): just iterate over all possible sequence combinations with one missing values
+performance:
+    - input parsing: 10ms (just filter for non blank lines from the input file)
+    - part1: 10ms
+    - part2 (first approach): 20ms
+    - part2 (second approach): 10ms
+    - combined: 30ms
+
+
+03: easy
+    - parse input as one long string
+    - use regex to find all correct locations of mul
+    - part1: sum up the multiplication results
+    - part2: find locations of do and dont and disable multiplication after dont
+    - part2 improve: split string by do then split substrings by dont and take first, rejoin substrings and do part1
+        improved from 60ms to 10ms
+performance:
+    - input parsing: 10ms (just join to one continuous string)
+    - part1: 10ms
+    - part2: <10ms
+    - combined: 20ms
+
+
+04: medium
+    - parse non empty input lines
+    - part1: find search string line by line forward an backward, rotate and do the same, then get all diagonals and do the same for those
+    - part2: ignore first and last row and column, search for As and then check if the X-MAS is there
+performance:
+    - input parsing: 10ms (just filter for non blank lines from the input file)
+    - part1: 40ms
+    - part2: 60ms
+    - combined: 110ms
+
+
+05: medium
+    - parse input -> read until empty line for rules then read until end for update sequences
+    - part1: iterate over all update lists and check if they are in order by looking if a rule is violated for each number in the update sequence
+    - part2: filter out incorrectly ordered lists similar to part1, then sort the list based on the rules
+        sorting is implemented as selection sort
+performance:
+    - input parsing: 10ms (parses rules into a map and updates into lists)
+    - part1: 10ms
+    - part2: 20ms
+    - combined: 40ms
+
+
+06: hard
+    - parse non empty input lines
+    - created a class structure for the guard/movement of a guard:
+        - a guard has a starting position and direction (the direction is represented as a position and also serves as relative movement of the guard)
+        - a guard can turn, move and look at the spot in front of it
+        - every time a guard moves or turns, the time advances and the guard object changes
+        - the guard itself does not check if it moves into an obstacle, so this needs to be covered by the program
+    - part1: let the guard move according to the rules to reach the end
+    - part2: in every position the guard steps at, check if she would run into a loop if an obstacle is placed in front
+        - additional rule: no obstacles on a position the guard already was on
+        - optimization: for the loop finding we do not care about single steps, so always move until next obstacle, without copying the guard object
+            reduced time from 30s to ~800ms
+        - I could be smarter about how to look for loops e.g. are we on a path that we know ends up in a loop
+performance:
+    - input parsing: 10ms (just filter for non blank lines from the input file)
+    - part1: 40ms
+    - part2: 800ms
+    - combined: 850ms
+
+
+07: very easy
+    - parse non empty input lines
+    - created a general implementation that takes HOF as parameters, both parts of the problem can be solved by passing different functions
+        the general implementation traverses the input values backwards and always reduces the left hand side
+        this avoids the wide search tree that would be created by going form left to right and add/multiply
+        instead I can divide and subtract and stop if the division has a remainder or the subtraction is negative we can stop
+    - part1: use 2 HOF to subtract and divide (after checking the remainder)
+    - part2: add a third HOF that splits of a number from the right if the number ends with it (this is the reverse operation to appending a number to another)
+    - the use of HOF slowed the program down though -> from ~10ms to ~30ms for both parts
+performance:
+    - input parsing: 10ms (just filter for non blank lines from the input file)
+    - part1: 30ms
+    - part2: 30ms
+    - combined: 70ms
+
+
+08: medium
+    - parse non empty inputs lines
+    - parse all lines for antennas of the same frequency (same char) by grouping them to a map, then just use the values as we are not interested in the actual frequency name
+    - part1: go over all possible pairs of antennas of the same frequency and add the antiodes (one left one right)
+        as the added antinodes could be the same and off the map, we need to sanitize the output by using a set and checking if the indices are out of range
+    - part2: now not only calculate one antinode left and one right, but all antinodes created by each pair
+        iterate over all left antinodes and right antinodes and add them to a set
+performance:
+    - input parsing: <10ms (just filter for non blank lines from the input file)
+    - part1: 10-20ms
+    - part2: <10ms
+    - combined: 20-30ms
+
+
+
+09: easy-medium
+10: very easy
